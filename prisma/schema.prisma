@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String      @id @default(uuid())
+  created_at        DateTime    @default(now())   
+  updated_at        DateTime    @updatedAt
+  name              String
+  email             String      @unique
+  mobile            String?
+  role              Role
+  order_history     Order_history[]
+}
+
+model Product {
+  id                String      @id @default(uuid())
+  created_at        DateTime    @default(now())   
+  updated_at        DateTime    @updatedAt
+  code              String      @unique
+  name              String
+  description       String?
+  category          String
+  weight            Float
+  order_entries     Order_entries[]
+}
+
+model Customer {
+  id                String      @id @default(uuid())
+  created_at        DateTime    @default(now())   
+  updated_at        DateTime    @updatedAt
+  name              String
+  email             String      @unique
+  mobile            String?
+  address           String
+  orders            Purchase_order[]
+  geofence_areas    Geofence_area?
+}
+
+model Geofence_area {
+  id                  String            @id @default(uuid())
+  created_at          DateTime          @default(now())   
+  updated_at          DateTime          @updatedAt
+  customer            Customer          @relation(fields: [customer_id], references: [id])
+  customer_id         String @unique
+  radius              Float
+  loc_lat             Float
+  loc_lon             Float
+}
+
+model Purchase_order {
+  id                    String      @id @default(uuid())
+  created_at            DateTime    @default(now())   
+  updated_at            DateTime    @updatedAt
+  status                Status
+  loc_lat               Float?
+  loc_lon               Float?
+  customer              Customer    @relation(fields: [customer_id],references: [id])
+  customer_id           String
+  order_entries         Order_entries[]
+  total_weight          Float?
+  order_history         Order_history[]
+  delivery_attempts     Int @default(0)
+  is_locker_used        Boolean @default(false)
+  locker                Smart_locker?
+}
+
+model Order_entries {
+  id                    String      @id @default(uuid())
+  created_at            DateTime    @default(now())   
+  updated_at            DateTime    @updatedAt
+  order                 Purchase_order? @relation(fields: [order_id], references: [id])
+  order_id              String?
+  product               Product     @relation(fields: [product_id], references: [id])
+  product_id            String
+  quantity              Int
+}
+
+model Order_history {
+  id                  String            @id @default(uuid())
+  created_at          DateTime          @default(now())   
+  updated_at          DateTime          @updatedAt
+  updated_by          User              @relation(fields: [user_id],references: [id])
+  user_id             String
+  order               Purchase_order    @relation(fields: [order_id],references: [id])
+  order_id            String
+  loc_lat             Float?
+  loc_lon             Float?
+  status              Status
+  description         String?
+}
+
+model Smart_locker {
+  id                             String            @id @default(uuid())
+  created_at                     DateTime          @default(now())   
+  updated_at                     DateTime          @updatedAt
+  address                        String
+  code                           String            @unique
+  status                         Locker_status     @default(inactive)
+  pin                            Int
+  associated_order               Purchase_order?   @relation(fields: [associated_order_id], references: [id])
+  associated_order_id            String? @unique
+}
+
+enum Role {
+  admin
+  inventory_manager
+  logistics_manager
+  delivery_person
+}
+
+enum Status {
+  initiated
+  in_progress
+  in_transit
+  reached_facility
+  ready_for_dispatch
+  out_for_delivery
+  delivered_to_customer
+  locker_assigned
+  delivered_to_locker
+  cancelled
+}
+
+enum Locker_status {
+  active
+  inactive
+  occupied
+  available
+  out_of_order
+}
