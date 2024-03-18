@@ -26,6 +26,14 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Prerequisites
+
+```bash
+$ Should have node installed in the system
+$ Download from - https://nodejs.org/en
+$ Install the downloaded node program
+```
+
 ## Installation
 
 ```bash
