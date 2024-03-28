@@ -11,6 +11,12 @@ export class GeoFencingDto {
 
   @IsLongitude()
   longitude: string;
+
+  @IsString()
+  order_id: string;
+
+  @IsString()
+  driver_id: string;
 }
 
 export class SendSMSDto {

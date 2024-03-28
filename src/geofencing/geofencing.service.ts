@@ -1,4 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { prismaError } from 'src/shared/error-handling';
 import * as geolib from 'geolib';
@@ -26,7 +29,12 @@ export class GeofencingService {
     dto: GeoFencingDto,
   ) {
     try {
-      const { latitude, longitude } = dto;
+      const {
+        latitude,
+        longitude,
+        driver_id,
+        order_id,
+      } = dto;
       const customer =
         await this.prisma.customer.findUnique({
           where: {
@@ -36,6 +44,21 @@ export class GeofencingService {
             geofence_areas: true,
           },
         });
+
+      if (!customer.geofence_areas.is_active) {
+        throw new NotFoundException(
+          'Customer geofence area is not active',
+        );
+      }
+
+      await this.prisma.driver_path.create({
+        data: {
+          latitude,
+          longitude,
+          order_id,
+          driver_id,
+        },
+      });
 
       // checks if 51.525/7.4575 is within a radius of 5 km from 51.5175/7.4678
       const isWithinRadius =
@@ -63,29 +86,42 @@ export class GeofencingService {
       console.log(distanceInMetres);
 
       if (isWithinRadius) {
-        if (distanceInMetres < 300) {
-          return this.sendSMSNotification({
-            phone: customer.mobile,
-            message: `\nHello ${customer.name},\nBe ready to pick up your order anytime soon`,
-          });
-        }
+        // if (distanceInMetres < 300) {
+        // return this.sendSMSNotification({
+        //   phone: customer.mobile,
+        //   message: `\nHello ${customer.name},\nBe ready to pick up your order anytime soon`,
+        // });
 
-        if (distanceInMetres < 500) {
-          return this.sendSMSNotification({
-            phone: customer.mobile,
-            message: `\nHello ${customer.name},\nDelivery person is in your proximity radius and will be at your doorstep in around 5-10 minutes`,
-          });
-        }
+        return {
+          phone: customer.mobile,
+          message: `\nHello ${customer.name},\nBe ready to pick up your order anytime soon`,
+        };
+        // }
+      }
+
+      if (distanceInMetres < 500) {
+        // return this.sendSMSNotification({
+        //   phone: customer.mobile,
+        //   message: `\nHello ${customer.name},\nDelivery person is in your proximity radius and will be at your doorstep in around 5-10 minutes`,
+        // });
+        return {
+          phone: customer.mobile,
+          message: `\nHello ${customer.name},\nDelivery person is in your proximity radius and will be at your doorstep in around 5-10 minutes`,
+        };
       }
 
       if (
         !isWithinRadius &&
         distanceInMetres < 2000
       ) {
-        return this.sendSMSNotification({
+        // return this.sendSMSNotification({
+        //   phone: customer.mobile,
+        //   message: `\nHello ${customer.name},\nDelivery person is near your area and will be at your doorstep soon`,
+        // });
+        return {
           phone: customer.mobile,
           message: `\nHello ${customer.name},\nDelivery person is near your area and will be at your doorstep soon`,
-        });
+        };
       }
 
       return false;

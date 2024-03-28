@@ -17,7 +17,21 @@ model User {
   password          String
   isVerified        Boolean     @default(false)
   role              Role?
+  orders            Purchase_order[]
   order_history     Order_history[]
+  driver_path       Driver_path[]
+}
+
+model Driver_path {
+  id                String      @id @default(uuid())
+  created_at        DateTime    @default(now())   
+  updated_at        DateTime    @updatedAt
+  latitude          String
+  longitude         String
+  driver            User        @relation(fields: [driver_id], references: [id])
+  driver_id         String
+  order             Purchase_order  @relation(fields: [order_id], references: [id])
+  order_id          String
 }
 
 model Product {
@@ -72,6 +86,9 @@ model Purchase_order {
   delivery_attempts     Int @default(0)
   is_locker_used        Boolean @default(false)
   locker                Smart_locker?
+  driver                User?        @relation(fields: [driver_id], references: [id])
+  driver_id             String?
+  driver_path           Driver_path[]
 }
 
 model Order_entries {

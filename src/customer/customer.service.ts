@@ -36,7 +36,17 @@ export class CustomerService {
             id,
           },
           include: {
-            orders: true,
+            orders: {
+              include: {
+                customer: {
+                  include: {
+                    geofence_areas: true,
+                  },
+                },
+                order_entries: true,
+                order_history: true,
+              },
+            },
             geofence_areas: true,
           },
         },

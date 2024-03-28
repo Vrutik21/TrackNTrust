@@ -54,4 +54,9 @@ export class UserController {
   ) {
     return this.userService.updateUser(id, dto);
   }
+
+  @Get('driver/:id')
+  getDriverInfo(@Param('id') id: string) {
+    return this.userService.getDriverInfo(id);
+  }
 }

@@ -1,5 +1,4 @@
 import {
-  ForbiddenException,
   Injectable,
   NotAcceptableException,
 } from '@nestjs/common';
@@ -34,6 +33,7 @@ export class PurchaseOrderService {
             },
             customer: true,
             locker: true,
+            driver_path: true,
           },
         },
       );
@@ -50,6 +50,7 @@ export class PurchaseOrderService {
             id,
           },
           include: {
+            driver_path: true,
             order_entries: {
               include: {
                 product: true,

@@ -206,4 +206,29 @@ export class UserService {
       prismaError(err);
     }
   }
+
+  async getDriverInfo(id: string) {
+    try {
+      return await this.prisma.user.findUnique({
+        where: {
+          role: 'delivery_person',
+          id,
+        },
+        include: {
+          orders: {
+            include: {
+              customer: {
+                include: {
+                  geofence_areas: true,
+                },
+              },
+            },
+          },
+          driver_path: true,
+        },
+      });
+    } catch (err) {
+      prismaError(err);
+    }
+  }
 }
