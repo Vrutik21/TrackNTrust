@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotAcceptableException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { prismaError } from 'src/shared/error-handling';
 import {
@@ -175,24 +179,46 @@ export class PurchaseOrderService {
         user_id,
       } = dto;
 
-      // const existingOrder =
-      //   await this.prisma.purchase_order.findUnique(
-      //     {
-      //       where: {
-      //         id,
-      //       },
-      //     },
-      //   );
+      const order =
+        await this.prisma.purchase_order.findUnique(
+          {
+            where: { id },
+            include: {
+              customer: true,
+            },
+          },
+        );
 
-      // if (
-      //   existingOrder.status === status &&
-      //   existingOrder.loc_lat === loc_lat &&
-      //   existingOrder.loc_lon === loc_lon
-      // ) {
-      //   throw new ForbiddenException(
-      //     'Order cannot be updated as there were no new changes!',
-      //   );
-      // }
+      if (
+        order.status === 'out_for_delivery' &&
+        order.delivery_attempts === 2
+      ) {
+        throw new NotAcceptableException(
+          'Cannot update as delivery attempts reached to maximum!',
+        );
+      }
+
+      if (order.status === 'out_for_delivery') {
+        await this.prisma.geofence_area.update({
+          where: {
+            customer_id: order.customer_id,
+          },
+          data: {
+            is_active: true,
+          },
+        });
+      }
+
+      if (order.status === 'failed_to_deliver') {
+        await this.prisma.geofence_area.update({
+          where: {
+            customer_id: order.customer_id,
+          },
+          data: {
+            is_active: false,
+          },
+        });
+      }
 
       const updatedOrder =
         await this.prisma.purchase_order.update({
@@ -216,6 +242,12 @@ export class PurchaseOrderService {
                 loc_lon,
               },
             },
+            ...(order.status ===
+              'failed_to_deliver' &&
+              order.delivery_attempts !== 2 && {
+                delivery_attempts:
+                  order.delivery_attempts + 1,
+              }),
           },
           include: {
             order_entries: true,

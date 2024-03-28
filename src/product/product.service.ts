@@ -33,4 +33,17 @@ export class ProductService {
       prismaError(err);
     }
   }
+
+  async deleteProduct(id: string) {
+    try {
+      return await this.prisma.product.update({
+        where: {
+          id,
+        },
+        data: {},
+      });
+    } catch (err) {
+      prismaError(err);
+    }
+  }
 }

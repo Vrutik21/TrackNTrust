@@ -6,10 +6,7 @@ import { UserService } from './user/user.service';
 import { UserModule } from './user/user.module';
 import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
-import {
-  ConfigModule,
-  ConfigService,
-} from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { PurchaseOrderController } from './purchase-order/purchase-order.controller';
 import { PurchaseOrderModule } from './purchase-order/purchase-order.module';
 import { PurchaseOrderService } from './purchase-order/purchase-order.service';
@@ -22,13 +19,8 @@ import { ProductService } from './product/product.service';
 import { LockerController } from './locker/locker.controller';
 import { LockerService } from './locker/locker.service';
 import { LockerModule } from './locker/locker.module';
-import {
-  JwtModule,
-  JwtService,
-} from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
 import * as dotenv from 'dotenv';
-import { JwtStrategy } from './shared/jwt/jwt.strategy';
+import { GeofencingModule } from './geofencing/geofencing.module';
 dotenv.config();
 
 @Module({
@@ -40,11 +32,7 @@ dotenv.config();
     CustomerModule,
     ProductModule,
     LockerModule,
-    JwtModule.register({
-      global: true,
-      secret: 'nestjsbackend',
-      signOptions: { expiresIn: '120s' },
-    }),
+    GeofencingModule,
   ],
   controllers: [
     AppController,

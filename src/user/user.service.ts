@@ -11,7 +11,6 @@ import {
   SignInDto,
   SignUpDto,
   UpdateUserDto,
-  UsersDto,
 } from './dto/user.dto';
 import * as bcrypt from 'bcryptjs';
 import { Request } from 'express';
@@ -27,8 +26,13 @@ export class UserService {
     dto: SignUpDto,
   ): Promise<{ token: string }> {
     try {
-      const { email, name, password, mobile } =
-        dto;
+      const {
+        email,
+        name,
+        password,
+        mobile,
+        role,
+      } = dto;
 
       const hashedPassword = await bcrypt.hash(
         password,
@@ -41,6 +45,7 @@ export class UserService {
           email,
           password: hashedPassword,
           mobile,
+          role,
         },
       });
 

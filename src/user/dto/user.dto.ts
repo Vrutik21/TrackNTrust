@@ -22,6 +22,9 @@ export class SignUpDto {
 
   @IsString()
   password: string;
+
+  @IsEnum(Role)
+  role: Role;
 }
 
 export class SignInDto {

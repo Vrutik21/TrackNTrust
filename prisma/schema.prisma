@@ -29,6 +29,7 @@ model Product {
   description       String?
   category          String
   weight            Float
+  isDeleted         Boolean     @default(false)
   order_entries     Order_entries[]
 }
 
@@ -53,6 +54,7 @@ model Geofence_area {
   radius              Float
   loc_lat             Float
   loc_lon             Float
+  is_active           Boolean           @default(false)
 }
 
 model Purchase_order {
@@ -123,6 +125,7 @@ enum Status {
   reached_facility
   ready_for_dispatch
   out_for_delivery
+  failed_to_deliver
   delivered_to_customer
   locker_assigned
   delivered_to_locker
