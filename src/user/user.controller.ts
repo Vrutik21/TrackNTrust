@@ -6,7 +6,6 @@ import {
   Patch,
   Post,
   Req,
-  Res,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {

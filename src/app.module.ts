@@ -19,6 +19,8 @@ import { ProductService } from './product/product.service';
 import { LockerModule } from './locker/locker.module';
 import * as dotenv from 'dotenv';
 import { GeofencingModule } from './geofencing/geofencing.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './shared/guards/auth.guard';
 dotenv.config();
 
 @Module({
@@ -47,6 +49,10 @@ dotenv.config();
     PurchaseOrderService,
     CustomerService,
     ProductService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
     // LockerService,
   ],
 })
