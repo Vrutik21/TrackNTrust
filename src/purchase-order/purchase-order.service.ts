@@ -32,7 +32,6 @@ export class PurchaseOrderService {
               },
             },
             customer: true,
-            locker: true,
             driver_path: true,
           },
         },
@@ -70,7 +69,6 @@ export class PurchaseOrderService {
                 geofence_areas: true,
               },
             },
-            locker: true,
           },
         },
       );
@@ -191,7 +189,7 @@ export class PurchaseOrderService {
         );
 
       if (
-        order.status === 'out_for_delivery' &&
+        status === 'out_for_delivery' &&
         order.delivery_attempts === 2
       ) {
         throw new NotAcceptableException(
@@ -199,7 +197,7 @@ export class PurchaseOrderService {
         );
       }
 
-      if (order.status === 'out_for_delivery') {
+      if (status === 'out_for_delivery') {
         await this.prisma.geofence_area.update({
           where: {
             customer_id: order.customer_id,
@@ -210,13 +208,14 @@ export class PurchaseOrderService {
         });
       }
 
-      if (order.status === 'failed_to_deliver') {
-        await this.prisma.geofence_area.update({
+      if (status === 'failed_to_deliver') {
+        await this.prisma.purchase_order.update({
           where: {
-            customer_id: order.customer_id,
+            id: order.id,
           },
           data: {
-            is_active: false,
+            delivery_attempts:
+              order.delivery_attempts + 1,
           },
         });
       }
@@ -243,12 +242,6 @@ export class PurchaseOrderService {
                 loc_lon,
               },
             },
-            ...(order.status ===
-              'failed_to_deliver' &&
-              order.delivery_attempts !== 2 && {
-                delivery_attempts:
-                  order.delivery_attempts + 1,
-              }),
           },
           include: {
             order_entries: true,
@@ -259,6 +252,17 @@ export class PurchaseOrderService {
             },
           },
         });
+
+      if (status === 'failed_to_deliver') {
+        await this.prisma.geofence_area.update({
+          where: {
+            customer_id: order.customer_id,
+          },
+          data: {
+            is_active: false,
+          },
+        });
+      }
 
       return updatedOrder;
     } catch (err) {

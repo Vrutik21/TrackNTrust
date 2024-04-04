@@ -16,8 +16,6 @@ import { CustomerModule } from './customer/customer.module';
 import { ProductController } from './product/product.controller';
 import { ProductModule } from './product/product.module';
 import { ProductService } from './product/product.service';
-import { LockerController } from './locker/locker.controller';
-import { LockerService } from './locker/locker.service';
 import { LockerModule } from './locker/locker.module';
 import * as dotenv from 'dotenv';
 import { GeofencingModule } from './geofencing/geofencing.module';
@@ -40,7 +38,7 @@ dotenv.config();
     PurchaseOrderController,
     CustomerController,
     ProductController,
-    LockerController,
+    // LockerController,
   ],
   providers: [
     AppService,
@@ -49,7 +47,7 @@ dotenv.config();
     PurchaseOrderService,
     CustomerService,
     ProductService,
-    LockerService,
+    // LockerService,
   ],
 })
 export class AppModule {}

@@ -1,8 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { prismaError } from 'src/shared/error-handling';
 import {
   CreateCustomerDto,
+  DeliveryPreferenceDto,
   UpdateCustomerDto,
 } from './dto/customer.dto';
 
@@ -112,6 +116,83 @@ export class CustomerService {
           id,
         },
       });
+    } catch (err) {
+      prismaError(err);
+    }
+  }
+
+  async upsertDeliveryPreference(
+    order_id: string,
+    dto: DeliveryPreferenceDto,
+  ) {
+    try {
+      const order =
+        await this.prisma.purchase_order.findUnique(
+          {
+            where: {
+              id: order_id,
+            },
+          },
+        );
+
+      const delivery_date = new Date(
+        dto.delivery_date,
+      );
+
+      if (order.delivery_attempts < 2) {
+        throw new ForbiddenException(
+          'Cannot set preference as delivery attempts have not reached!',
+        );
+      }
+
+      const preference =
+        await this.prisma.delivery_preference.upsert(
+          {
+            where: {
+              customer_id: order.customer_id,
+              order_id,
+            },
+            update: {
+              delivery_date,
+              delivery_time: dto.delivery_time,
+              order_id,
+              customer_id: order.customer_id,
+            },
+            create: {
+              delivery_date,
+              delivery_time: dto.delivery_time,
+              order_id,
+              customer_id: order.customer_id,
+            },
+          },
+        );
+
+      if (preference) {
+        await this.prisma.purchase_order.update({
+          where: {
+            id: order_id,
+          },
+          data: {
+            isDeliveryPreference: true,
+          },
+        });
+      }
+
+      return preference;
+    } catch (err) {
+      prismaError(err);
+    }
+  }
+
+  async deleteDeliveryPreference(id: string) {
+    try {
+      return await this.prisma.delivery_preference.delete(
+        {
+          where: {
+            id,
+          },
+        },
+      );
     } catch (err) {
       prismaError(err);
     }

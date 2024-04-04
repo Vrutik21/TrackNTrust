@@ -1,4 +1,5 @@
 import {
+  IsDateString,
   IsEmail,
   IsLatitude,
   IsLongitude,
@@ -59,4 +60,12 @@ export class UpdateCustomerDto {
   @IsNumberString()
   @IsOptional()
   radius: string;
+}
+
+export class DeliveryPreferenceDto {
+  @IsDateString()
+  delivery_date: Date;
+
+  @IsString()
+  delivery_time: string;
 }

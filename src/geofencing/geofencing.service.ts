@@ -86,28 +86,29 @@ export class GeofencingService {
       console.log(distanceInMetres);
 
       if (isWithinRadius) {
-        // if (distanceInMetres < 300) {
-        // return this.sendSMSNotification({
-        //   phone: customer.mobile,
-        //   message: `\nHello ${customer.name},\nBe ready to pick up your order anytime soon`,
-        // });
+        if (distanceInMetres < 300) {
+          // return this.sendSMSNotification({
+          //   phone: customer.mobile,
+          //   message: `\nHello ${customer.name},\nBe ready to pick up your order anytime soon`,
+          // });
 
-        return {
-          phone: customer.mobile,
-          message: `\nHello ${customer.name},\nBe ready to pick up your order anytime soon`,
-        };
-        // }
-      }
+          return {
+            phone: customer.mobile,
+            message: `\nHello ${customer.name},\nBe ready to pick up your order anytime soon`,
+          };
+          // }
+        }
 
-      if (distanceInMetres < 500) {
-        // return this.sendSMSNotification({
-        //   phone: customer.mobile,
-        //   message: `\nHello ${customer.name},\nDelivery person is in your proximity radius and will be at your doorstep in around 5-10 minutes`,
-        // });
-        return {
-          phone: customer.mobile,
-          message: `\nHello ${customer.name},\nDelivery person is in your proximity radius and will be at your doorstep in around 5-10 minutes`,
-        };
+        if (distanceInMetres < 500) {
+          // return this.sendSMSNotification({
+          //   phone: customer.mobile,
+          //   message: `\nHello ${customer.name},\nDelivery person is in your proximity radius and will be at your doorstep in around 5-10 minutes`,
+          // });
+          return {
+            phone: customer.mobile,
+            message: `\nHello ${customer.name},\nDelivery person is in your proximity radius and will be at your doorstep in around 5-10 minutes`,
+          };
+        }
       }
 
       if (
@@ -123,7 +124,6 @@ export class GeofencingService {
           message: `\nHello ${customer.name},\nDelivery person is near your area and will be at your doorstep soon`,
         };
       }
-
       return false;
     } catch (err) {
       prismaError(err);

@@ -57,6 +57,7 @@ model Customer {
   address           String
   orders            Purchase_order[]
   geofence_areas    Geofence_area?
+  delivery_preference Delivery_preference[]
 }
 
 model Geofence_area {
@@ -84,8 +85,11 @@ model Purchase_order {
   total_weight          Float?
   order_history         Order_history[]
   delivery_attempts     Int @default(0)
-  is_locker_used        Boolean @default(false)
-  locker                Smart_locker?
+  estimated_delivery    DateTime?
+  isDeliveryPreference  Boolean       @default(false)
+  preference            Delivery_preference?
+  is_locker_used        Boolean?
+  // locker                Smart_locker?
   driver                User?        @relation(fields: [driver_id], references: [id])
   driver_id             String?
   driver_path           Driver_path[]
@@ -116,17 +120,29 @@ model Order_history {
   description         String?
 }
 
-model Smart_locker {
-  id                             String            @id @default(uuid())
-  created_at                     DateTime          @default(now())   
-  updated_at                     DateTime          @updatedAt
-  address                        String
-  code                           String            @unique
-  status                         Locker_status     @default(inactive)
-  pin                            Int
-  associated_order               Purchase_order?   @relation(fields: [associated_order_id], references: [id])
-  associated_order_id            String? @unique
+model Delivery_preference {
+  id                  String            @id @default(uuid())
+  created_at          DateTime          @default(now())   
+  updated_at          DateTime          @updatedAt
+  delivery_date       DateTime
+  delivery_time       String      
+  order               Purchase_order    @relation(fields: [order_id], references: [id])
+  order_id            String            @unique  
+  customer            Customer          @relation(fields: [customer_id], references: [id])
+  customer_id         String
 }
+
+// model Smart_locker {
+//   id                             String            @id @default(uuid())
+//   created_at                     DateTime          @default(now())   
+//   updated_at                     DateTime          @updatedAt
+//   address                        String
+//   code                           String            @unique
+//   // status                         Locker_status     @default(inactive)
+//   pin                            Int
+//   associated_order               Purchase_order?   @relation(fields: [associated_order_id], references: [id])
+//   associated_order_id            String? @unique
+// }
 
 enum Role {
   admin
@@ -149,10 +165,10 @@ enum Status {
   cancelled
 }
 
-enum Locker_status {
-  active
-  inactive
-  occupied
-  available
-  out_of_order
-}
+// enum Locker_status {
+//   active
+//   inactive
+//   occupied
+//   available
+//   out_of_order
+// }
