@@ -49,10 +49,10 @@ dotenv.config();
     PurchaseOrderService,
     CustomerService,
     ProductService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AuthGuard,
+    // },
     // LockerService,
   ],
 })

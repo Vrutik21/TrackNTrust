@@ -6,6 +6,7 @@ import {
   Patch,
   Post,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
@@ -14,6 +15,7 @@ import {
   UpdateUserDto,
 } from './dto/user.dto';
 import { Request } from 'express';
+import { AuthGuard } from 'src/shared/guards/auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -37,6 +39,7 @@ export class UserController {
   }
 
   @Get()
+  @UseGuards(AuthGuard)
   getUsers() {
     return this.userService.getUsers();
   }

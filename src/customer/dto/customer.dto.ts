@@ -3,6 +3,7 @@ import {
   IsEmail,
   IsLatitude,
   IsLongitude,
+  IsNotEmpty,
   IsNumberString,
   IsOptional,
   IsString,

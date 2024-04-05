@@ -31,7 +31,7 @@ export class PurchaseOrderController {
     );
   }
 
-  @Post('create')
+  @Post()
   createOrder(@Body() dto: OrdersDto) {
     return this.purchaseOrderService.createOrder(
       dto,

@@ -76,6 +76,7 @@ model Purchase_order {
   id                    String      @id @default(uuid())
   created_at            DateTime    @default(now())   
   updated_at            DateTime    @updatedAt
+  order_code            Int?     @default(autoincrement())
   status                Status
   loc_lat               Float?
   loc_lon               Float?
@@ -160,8 +161,6 @@ enum Status {
   out_for_delivery
   failed_to_deliver
   delivered_to_customer
-  locker_assigned
-  delivered_to_locker
   cancelled
 }
 

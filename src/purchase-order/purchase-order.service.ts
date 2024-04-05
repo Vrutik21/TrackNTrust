@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable,
   NotAcceptableException,
 } from '@nestjs/common';
@@ -89,6 +90,12 @@ export class PurchaseOrderService {
 
       let entries = [];
       let total_weight: number = 0;
+
+      if (order_entries.length === 0) {
+        throw new ForbiddenException(
+          'Please add products in the order.',
+        );
+      }
 
       for (const {
         product_id,

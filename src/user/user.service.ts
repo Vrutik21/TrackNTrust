@@ -222,6 +222,7 @@ export class UserService {
                   geofence_areas: true,
                 },
               },
+              order_entries: true,
             },
           },
           driver_path: true,
