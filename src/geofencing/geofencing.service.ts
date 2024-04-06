@@ -51,15 +51,6 @@ export class GeofencingService {
         );
       }
 
-      await this.prisma.driver_path.create({
-        data: {
-          latitude,
-          longitude,
-          order_id,
-          driver_id,
-        },
-      });
-
       // checks if 51.525/7.4575 is within a radius of 5 km from 51.5175/7.4678
       const isWithinRadius =
         geolib.isPointWithinRadius(
@@ -86,7 +77,16 @@ export class GeofencingService {
       console.log(distanceInMetres);
 
       if (isWithinRadius) {
-        if (distanceInMetres < 300) {
+        await this.prisma.driver_path.create({
+          data: {
+            latitude,
+            longitude,
+            order_id,
+            driver_id,
+          },
+        });
+
+        if (distanceInMetres < 100) {
           // return this.sendSMSNotification({
           //   phone: customer.mobile,
           //   message: `\nHello ${customer.name},\nBe ready to pick up your order anytime soon`,
@@ -96,10 +96,9 @@ export class GeofencingService {
             phone: customer.mobile,
             message: `\nHello ${customer.name},\nBe ready to pick up your order anytime soon`,
           };
-          // }
         }
 
-        if (distanceInMetres < 500) {
+        if (distanceInMetres < 300) {
           // return this.sendSMSNotification({
           //   phone: customer.mobile,
           //   message: `\nHello ${customer.name},\nDelivery person is in your proximity radius and will be at your doorstep in around 5-10 minutes`,
@@ -111,10 +110,7 @@ export class GeofencingService {
         }
       }
 
-      if (
-        !isWithinRadius &&
-        distanceInMetres < 2000
-      ) {
+      if (distanceInMetres < 1000) {
         // return this.sendSMSNotification({
         //   phone: customer.mobile,
         //   message: `\nHello ${customer.name},\nDelivery person is near your area and will be at your doorstep soon`,

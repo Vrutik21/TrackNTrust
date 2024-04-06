@@ -39,7 +39,7 @@ export class UserController {
   }
 
   @Get()
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   getUsers() {
     return this.userService.getUsers();
   }

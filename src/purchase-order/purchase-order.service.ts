@@ -1,7 +1,6 @@
 import {
   ForbiddenException,
   Injectable,
-  NotAcceptableException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { prismaError } from 'src/shared/error-handling';
@@ -9,11 +8,13 @@ import {
   OrdersDto,
   UpdateOrdersDto,
 } from './dto/orders.dto';
+import { GeofencingService } from 'src/geofencing/geofencing.service';
 
 @Injectable()
 export class PurchaseOrderService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly geofencingSerive: GeofencingService,
   ) {}
 
   async getAllOrders() {
@@ -34,6 +35,7 @@ export class PurchaseOrderService {
             },
             customer: true,
             driver_path: true,
+            preference: true,
           },
         },
       );
@@ -70,6 +72,7 @@ export class PurchaseOrderService {
                 geofence_areas: true,
               },
             },
+            preference: true,
           },
         },
       );
@@ -195,15 +198,6 @@ export class PurchaseOrderService {
           },
         );
 
-      if (
-        status === 'out_for_delivery' &&
-        order.delivery_attempts === 2
-      ) {
-        throw new NotAcceptableException(
-          'Cannot update as delivery attempts reached to maximum!',
-        );
-      }
-
       if (status === 'out_for_delivery') {
         await this.prisma.geofence_area.update({
           where: {
@@ -213,16 +207,54 @@ export class PurchaseOrderService {
             is_active: true,
           },
         });
+
+        if (!order.driver_id) {
+          await this.prisma.purchase_order.update(
+            {
+              where: {
+                id,
+              },
+              data: {
+                driver_id:
+                  'efadf31d-5556-49e5-afb8-29319f7a71cc',
+              },
+            },
+          );
+        }
       }
 
       if (status === 'failed_to_deliver') {
-        await this.prisma.purchase_order.update({
+        const failedOrder =
+          await this.prisma.purchase_order.update(
+            {
+              where: {
+                id: order.id,
+              },
+              data: {
+                delivery_attempts:
+                  order.delivery_attempts + 1,
+              },
+            },
+          );
+
+        if (
+          failedOrder.delivery_attempts === 2
+          // && dto.status === 'reached_facility'
+        ) {
+          await this.geofencingSerive.sendSMSNotification(
+            {
+              phone: order.customer.mobile,
+              message: `\nHello ${order.customer.name},\nwe hope you're well. We apologize for the inconvenience caused by our recent unsuccessful delivery attempts. \nTo ensure smooth delivery in the future, please update your preferences using the form linked here: \nhttps://e316-2605-8d80-6a0-a475-5838-1761-a59c-7083.ngrok-free.app/customer/preference/${order.id}.\n\nYour satisfaction is important to us. Thank you for your cooperation.\n\nBest regards,\nTrustNTrack`,
+            },
+          );
+        }
+
+        await this.prisma.geofence_area.update({
           where: {
-            id: order.id,
+            customer_id: order.customer_id,
           },
           data: {
-            delivery_attempts:
-              order.delivery_attempts + 1,
+            is_active: false,
           },
         });
       }
@@ -259,17 +291,6 @@ export class PurchaseOrderService {
             },
           },
         });
-
-      if (status === 'failed_to_deliver') {
-        await this.prisma.geofence_area.update({
-          where: {
-            customer_id: order.customer_id,
-          },
-          data: {
-            is_active: false,
-          },
-        });
-      }
 
       return updatedOrder;
     } catch (err) {

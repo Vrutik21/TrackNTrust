@@ -152,6 +152,13 @@ export class UserService {
           orderBy: {
             updated_at: 'desc',
           },
+          include: {
+            _count: {
+              select: {
+                orders: true,
+              },
+            },
+          },
         });
 
       return users;
@@ -166,6 +173,15 @@ export class UserService {
         await this.prisma.user.findUnique({
           where: {
             id,
+          },
+          include: {
+            orders: {
+              include: {
+                order_entries: true,
+                order_history: true,
+                customer: true,
+              },
+            },
           },
         });
 

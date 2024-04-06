@@ -21,6 +21,7 @@ import * as dotenv from 'dotenv';
 import { GeofencingModule } from './geofencing/geofencing.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './shared/guards/auth.guard';
+import { GeofencingService } from './geofencing/geofencing.service';
 dotenv.config();
 
 @Module({
@@ -49,6 +50,7 @@ dotenv.config();
     PurchaseOrderService,
     CustomerService,
     ProductService,
+    GeofencingService,
     // {
     //   provide: APP_GUARD,
     //   useClass: AuthGuard,
