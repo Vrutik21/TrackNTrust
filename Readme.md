@@ -130,7 +130,7 @@ Open `http://localhost:3000` to view it in your browser.
 
 ## Project Structure
 
-- **Backend**:: Contains the Nest.js application.
+- **Backend**: Contains the Nest.js application.
 - **Frontend**: Contains the React.js application.
 
 ## Project Submission
