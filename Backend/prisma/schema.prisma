@@ -133,18 +133,6 @@ model Delivery_preference {
   customer_id         String
 }
 
-// model Smart_locker {
-//   id                             String            @id @default(uuid())
-//   created_at                     DateTime          @default(now())   
-//   updated_at                     DateTime          @updatedAt
-//   address                        String
-//   code                           String            @unique
-//   // status                         Locker_status     @default(inactive)
-//   pin                            Int
-//   associated_order               Purchase_order?   @relation(fields: [associated_order_id], references: [id])
-//   associated_order_id            String? @unique
-// }
-
 enum Role {
   admin
   inventory_manager
@@ -163,11 +151,3 @@ enum Status {
   delivered_to_customer
   cancelled
 }
-
-// enum Locker_status {
-//   active
-//   inactive
-//   occupied
-//   available
-//   out_of_order
-// }

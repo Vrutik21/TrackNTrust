@@ -2,7 +2,7 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-Start the backend first - https://github.com/Vrutik21/TrackNTrust-Backend
+Start the backend first from the ../Backend directory
 
 Follow the steps in the Readme.md file in the Backend project structure
 

@@ -40,6 +40,13 @@ $ Install the downloaded node program
 $ npm install
 ```
 
+## If there is any database migration error, run prisma commands:
+
+```bash
+npm run migrate
+npm run generate
+```
+
 ## Running the app
 
 ```bash
