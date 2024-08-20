@@ -1,4 +1,4 @@
-# TrustNTrack - Prototype logistics system
+# Track&Trust - Prototype logistics system
 
 **Track & Trust: Where Packages Find Their Way, Every Step of the Journey!**
 
